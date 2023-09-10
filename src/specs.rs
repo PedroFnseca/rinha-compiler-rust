@@ -90,7 +90,7 @@ pub struct Binary {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Call {
   kind: String,
-  calle: serde_json::Value,
+  callee: serde_json::Value,
   arguments: Vec<serde_json::Value>,
   location: Loc
 }
@@ -137,6 +137,15 @@ pub struct Var {
   kind: String,
   text: String,
   location: Loc
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Functions {
+  pub calles: Vec<Call>,
+  pub functions: Vec<Function>,
+  pub prints: Vec<Print>,
+  pub firsts: Vec<First>,
+  pub seconds: Vec<Second>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
