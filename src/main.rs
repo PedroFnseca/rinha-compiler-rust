@@ -4,8 +4,7 @@ use serde_json::Value;
 
 pub struct Compiler {
   file_content: String,
-  file: Option<specs::File>,
-  functions: Option<specs::Functions>
+  file: Option<specs::File>
 }
 
 impl Compiler {
@@ -14,8 +13,7 @@ impl Compiler {
 
     Compiler {
       file_content: file_content,
-      file: None,
-      functions: None
+      file: None
     }
   }
 
@@ -56,8 +54,37 @@ impl Compiler {
     }
   }
 
-  fn handler_functions(&mut self) {
-    let targets = ["Call", "Function", "Print", "First", "Second"];
+  fn sort_results_by_location_start(&self, results: &mut Vec<(&str, &Value)>) {
+    results.sort_by(|a, b| {
+        let a_start = a.1.get("location").expect("REASON").get("start");
+        let b_start = b.1.get("location").expect("REASON").get("start");
+
+        if let (Some(a_start), Some(b_start)) = (a_start, b_start) {
+            if let (Some(a_start), Some(b_start)) = (a_start.as_i64(), b_start.as_i64()) {
+                return a_start.cmp(&b_start);
+            }
+        }
+
+        std::cmp::Ordering::Equal
+    });
+}
+
+  fn handler_terms(&mut self) {
+    let targets = [
+      "If",
+      "Let",
+      "Str",
+      "Bool",
+      "Int",
+      "Binary",
+      "Call",
+      "Function",
+      "Print",
+      "First",
+      "Second",
+      "Tuple",
+      "Var"
+    ];
 
     let mut results = Vec::new();
 
@@ -66,41 +93,12 @@ impl Compiler {
       {
         Self::find_key_value_recursive(&file_value, &targets, &mut results);
       }
-      let mut functions = specs::Functions {
-        calles: Vec::new(),
-        functions: Vec::new(),
-        prints: Vec::new(),
-        firsts: Vec::new(),
-        seconds: Vec::new()
-      };
 
+      self.sort_results_by_location_start(&mut results);
+      
       for (kind, value) in results {
-        match kind {
-          "Call" => {
-            let call: specs::Call = serde_json::from_value(value.clone()).unwrap();
-            functions.calles.push(call);
-          },
-          "Function" => {
-            let function: specs::Function = serde_json::from_value(value.clone()).unwrap();
-            functions.functions.push(function);
-          },
-          "Print" => {
-            let print: specs::Print = serde_json::from_value(value.clone()).unwrap();
-            functions.prints.push(print);
-          },
-          "First" => {
-            let first: specs::First = serde_json::from_value(value.clone()).unwrap();
-            functions.firsts.push(first);
-          },
-          "Second" => {
-            let second: specs::Second = serde_json::from_value(value.clone()).unwrap();
-            functions.seconds.push(second);
-          },
-          _ => {}
-        }
+        println!("{}: {:?}", kind, value.get("location").expect("REASON").get("start"));
       }
-
-      self.functions = Some(functions);
     }
   }
 
@@ -111,7 +109,7 @@ impl Compiler {
 
     self.file = Some(_file);
 
-    self.handler_functions();
+    self.handler_terms();
   }
 }
 
