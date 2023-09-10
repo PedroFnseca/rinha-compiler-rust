@@ -18,16 +18,16 @@ pub struct Parameter {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct File {
   name: String,
-  expression: Term,
+  expression: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct If {
   kind: String,
-  condition: Box<Term>,
-  then: Box<Term>,
-  otherwise: Box<Term>,
+  condition: serde_json::Value,
+  then: serde_json::Value,
+  otherwise: serde_json::Value,
   location: Loc
 }
 
@@ -35,8 +35,8 @@ pub struct If {
 pub struct Let {
   kind: String,
   name: Parameter,
-  value: Box<Term>,
-  next: Box<Term>,
+  value: serde_json::Value,
+  next: serde_json::Value,
   location: Loc
 }
 
@@ -82,16 +82,16 @@ enum BinaryOp {
 pub struct Binary {
   kind: String,
   op: BinaryOp,
-  lhs: Box<Term>,
-  rhs: Box<Term>,
+  lhs: serde_json::Value,
+  rhs: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Call {
   kind: String,
-  calle: Box<Term>,
-  arguments: Vec<Box<Term>>,
+  calle: serde_json::Value,
+  arguments: Vec<serde_json::Value>,
   location: Loc
 }
 
@@ -99,36 +99,36 @@ pub struct Call {
 pub struct Function {
   kind: String,
   parameters: Vec<Parameter>,
-  value: Box<Term>,
+  value: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Print {
   kind: String,
-  value: Box<Term>,
+  value: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct First {
   kind: String,
-  value: Box<Term>,
+  value: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Second {
   kind: String,
-  value: Box<Term>,
+  value: serde_json::Value,
   location: Loc
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Tuple {
   kind: String,
-  first: Box<Term>,
-  second: Box<Term>,
+  first: serde_json::Value,
+  second: serde_json::Value,
   location: Loc
 }
 
@@ -154,4 +154,5 @@ pub enum Term {
   Second(Second),
   Tuple(Tuple),
   Var(Var),
+  None
 }
